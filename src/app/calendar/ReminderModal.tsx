@@ -19,12 +19,23 @@ import {
   Box,
 } from '@chakra-ui/react';
 
+export type Reminder = {
+  id?: string;
+  title: string;
+  color: string;
+  date: Date;
+  city: string;
+};
+
+//6f2938e6fae5cd744b897d9098df7e78
 export default function ReminderModal({
   isOpen,
   onClose,
+  onSubmit,
 }: {
   isOpen: boolean;
   onClose: () => void;
+  onSubmit: (reminder: Reminder) => void;
 }) {
   const { handleSubmit, errors, register, control, formState } = useForm();
 
@@ -35,21 +46,19 @@ export default function ReminderModal({
       return 'Max 30 chars please';
     } else return true;
   }
-
-  function onSave(values: any) {
-    return new Promise<void>((resolve) => {
-      setTimeout(() => {
-        alert(JSON.stringify(values, null, 2));
-        resolve();
-      }, 3000);
-    });
+  function validateCity(value: any) {
+    if (!value) {
+      return 'Please write a city';
+    } else if (value.length > 30) {
+      return 'Max 30 chars please';
+    } else return true;
   }
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent>
-        <form onSubmit={handleSubmit(onSave)}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <ModalHeader>Reminder</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
@@ -61,11 +70,22 @@ export default function ReminderModal({
                   placeholder="Add a title to your reminder"
                   ref={register({ validate: validateTitle })}
                 />
-
                 <FormErrorMessage>
                   {errors.title && errors.title.message}
                 </FormErrorMessage>
               </FormControl>
+
+              <FormControl paddingTop="10px" isInvalid={errors.city}>
+                <Input
+                  name="city"
+                  placeholder="Add a city"
+                  ref={register({ validate: validateCity })}
+                />
+                <FormErrorMessage>
+                  {errors.city && errors.city.message}
+                </FormErrorMessage>
+              </FormControl>
+
               <FormControl paddingTop="10px">
                 <Controller
                   name="date"
@@ -95,6 +115,7 @@ export default function ReminderModal({
                         marginBottom="10px"
                         backgroundColor={value}
                         borderRadius="0.375rem"
+                        border="1px solid rgb(226, 232, 240)"
                       ></Box>
                       <HexColorPicker color={value} onChange={onChange} />
                     </>
