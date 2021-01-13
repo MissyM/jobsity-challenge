@@ -17,6 +17,7 @@
     "framer-motion": "^3.2.0",
     "moment": "^2.29.1",
     "react": "^16.9.0",
+    "react-colorful": "^4.4.4",
     "react-datepicker": "^3.4.0",
     "react-dom": "^16.9.0",
     "react-hook-form": "^6.14.1",

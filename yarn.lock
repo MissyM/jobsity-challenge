@@ -10046,6 +10046,11 @@
   dependencies:
     "@babel/runtime" "^7.0.0"
 
+"react-colorful@^4.4.4":
+  "integrity" "sha512-01V2/6rr6sa1vaZntWZJXZxnU7ew02NG2rqq0eoVp4d3gFU5Ug9lDzNMbr+8ns0byXsJbBR8LbwQTlAjz6x7Kg=="
+  "resolved" "https://registry.npmjs.org/react-colorful/-/react-colorful-4.4.4.tgz"
+  "version" "4.4.4"
+
 "react-datepicker@^3.4.0":
   "integrity" "sha512-AKvCtkU9C4GXULtJ4naEjeC7yScT94GdNuU5/Szxp9JEf7NK2QPO8zPzhJABwK3UkAel+okimL6B85m6Xx1TVw=="
   "resolved" "https://registry.npmjs.org/react-datepicker/-/react-datepicker-3.4.0.tgz"
@@ -10088,7 +10093,7 @@
     "strip-ansi" "6.0.0"
     "text-table" "0.2.0"
 
-"react-dom@*", "react-dom@^15.5.x || ^16.x", "react-dom@^16.8.0", "react-dom@^16.9.0", "react-dom@>=16.8", "react-dom@>=16.8.6":
+"react-dom@*", "react-dom@^15.5.x || ^16.x", "react-dom@^16.8.0", "react-dom@^16.9.0", "react-dom@>=16.8", "react-dom@>=16.8.0", "react-dom@>=16.8.6":
   "integrity" "sha512-YFT2rxO9hM70ewk9jq0y6sQk8cL02xm4+IzYBz75CQGlClQQ1Bxq0nhHF6OtSbit+AIahujJgb/CPRibFkMNJQ=="
   "resolved" "https://registry.npmjs.org/react-dom/-/react-dom-16.9.0.tgz"
   "version" "16.9.0"

@@ -1,23 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
-import { CSSReset, Flex } from '@chakra-ui/react';
-import {
-  Box,
-  Button,
-  Grid,
-  useDisclosure,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
-} from '@chakra-ui/react';
+import { Box, Button, Flex, Grid, useDisclosure } from '@chakra-ui/react';
 
-import HookForm from './HookForm';
+import ReminderModal from './ReminderModal';
 
 const reminders = [{ title: 'coso1' }, { title: 'coso2' }, { title: 'coso3' }];
 
@@ -29,7 +15,6 @@ export default function Calendar() {
   const [gridCalendar, setGridCalendar] = useState<Calendar | null>();
   console.log(gridCalendar);
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [startDate, setStartDate] = useState<Date>();
 
   useEffect(() => {
     const now = new Date(2021, 1, 3);
@@ -78,36 +63,7 @@ export default function Calendar() {
           Next
         </Button>
       </Flex>
-
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Reminder</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <CSSReset />
-            <Box p={4}>
-              <HookForm />
-            </Box>
-          </ModalBody>
-
-          <ModalFooter>
-            <Button colorScheme="blue" mr={3} onClick={onClose}>
-              Close
-            </Button>
-            <Button variant="ghost">Save</Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-      <DatePicker
-        selected={startDate}
-        onChange={(date: Date) => {
-          setStartDate(date as Date);
-          console.log(date.getDay());
-        }}
-        showTimeSelect
-        dateFormat="Pp"
-      />
+      <ReminderModal isOpen={isOpen} onClose={onClose} />
     </Box>
   );
 }
