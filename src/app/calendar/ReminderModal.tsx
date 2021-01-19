@@ -1,7 +1,7 @@
 import { useForm, Controller } from 'react-hook-form';
 import { HexColorPicker } from 'react-colorful';
 import 'react-colorful/dist/index.css';
-import React from 'react';
+import React, { useEffect } from 'react';
 import DatePicker from 'react-datepicker';
 import {
   CSSReset,
@@ -27,17 +27,49 @@ export type Reminder = {
   city: string;
 };
 
-//6f2938e6fae5cd744b897d9098df7e78
 export default function ReminderModal({
   isOpen,
   onClose,
   onSubmit,
+  currentReminder,
+  currentDayNum,
 }: {
   isOpen: boolean;
+  currentReminder?: Reminder;
+  currentDayNum?: number;
   onClose: () => void;
   onSubmit: (reminder: Reminder) => void;
 }) {
-  const { handleSubmit, errors, register, control, formState } = useForm();
+  const {
+    handleSubmit,
+    errors,
+    register,
+    control,
+    formState,
+    reset,
+  } = useForm();
+
+  // const api = {
+  //   key: '6f2938e6fae5cd744b897d9098df7e78',
+  //   base: 'http://api.openweathermap.org/data/2.5',
+  // };
+
+  useEffect(() => {
+    if (currentDayNum) {
+      const currentMonth = new Date().getMonth();
+      const currentYear = new Date().getFullYear();
+
+      reset({ date: new Date(currentYear, currentMonth, currentDayNum) });
+    }
+  }, [reset, currentDayNum]);
+
+  useEffect(() => {
+    if (currentReminder) {
+      reset(currentReminder);
+    } else {
+      reset();
+    }
+  }, [reset, currentReminder]);
 
   function validateTitle(value: any) {
     if (!value) {
@@ -102,13 +134,14 @@ export default function ReminderModal({
                   )}
                 />
               </FormControl>
+
               <FormControl paddingTop="10px">
                 <Controller
                   name="color"
                   control={control}
                   defaultValue="#fff"
                   render={({ onChange, value }) => (
-                    <>
+                    <Box>
                       <Box
                         w="201px"
                         h="40px"
@@ -118,7 +151,7 @@ export default function ReminderModal({
                         border="1px solid rgb(226, 232, 240)"
                       ></Box>
                       <HexColorPicker color={value} onChange={onChange} />
-                    </>
+                    </Box>
                   )}
                 />
               </FormControl>

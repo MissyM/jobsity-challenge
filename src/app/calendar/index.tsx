@@ -5,7 +5,7 @@ import { v4 as uuidV4 } from 'uuid';
 import { Box, Button, Flex, Grid, useDisclosure } from '@chakra-ui/react';
 
 import ReminderModal, { Reminder } from './ReminderModal';
-import { getJSDocReadonlyTag } from 'typescript';
+import HeaderWeek from './HeaderWeek';
 
 type Day = null | { dayNum: number; reminders: Reminder[] };
 type Calendar = Day[][];
@@ -14,27 +14,35 @@ const currentDate = new Date().getDate();
 const currentMonth = new Date().getMonth();
 const currentYear = new Date().getFullYear();
 
-export default function Calendar() {
+export default function CalendarRendering() {
   const [gridCalendar, setGridCalendar] = useState<Calendar | null>();
+  const [currentReminder, setCurrentReminder] = useState<Reminder>();
+  const [currentDayNum, setCurrentDayNum] = useState<number>();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   useEffect(() => {
     const now = new Date();
-
+    // Get initial day of month
     const startWeekDay = new Date(
       now.getFullYear(),
       now.getMonth(),
       1
     ).getDay();
+    // Get the number of days
     const numDays = new Date(
       now.getFullYear(),
       now.getMonth() + 1,
       0
     ).getDate();
 
-    const calendar = generateCalendar(startWeekDay, numDays);
-    setGridCalendar(calendar);
+    const generatedCalendar = generateCalendar(startWeekDay, numDays); // Get generated calendar
+    setGridCalendar(generatedCalendar); // Set calendar on state
   }, []);
+
+  const handleDayClick = (dayNum?: number) => {
+    setCurrentDayNum(dayNum);
+    onOpen();
+  };
 
   const onSubmit = (reminder: Reminder) => {
     return new Promise<void>((resolve, reject) => {
@@ -47,27 +55,71 @@ export default function Calendar() {
           onClose();
           reject();
         }
-        if (reminder.id) {
-        } else {
-          const id = uuidV4();
-          const date = reminder.date.getDate();
 
-          if (gridCalendar) {
+        if (gridCalendar) {
+          if (currentReminder) {
+            for (
+              let weekIndex = 0;
+              weekIndex < gridCalendar?.length;
+              weekIndex++
+            ) {
+              for (let dayIndex = 0; dayIndex < 7; dayIndex++) {
+                const remindersList =
+                  gridCalendar[weekIndex][dayIndex]?.reminders;
+                if (remindersList) {
+                  for (
+                    let reminderIndex = 0;
+                    reminderIndex < remindersList.length;
+                    reminderIndex++
+                  ) {
+                    // Allow edit and save reminder object
+
+                    if (
+                      remindersList[reminderIndex].id === currentReminder.id
+                    ) {
+                      remindersList[reminderIndex] = {
+                        ...reminder,
+                        id: currentReminder.id, //Conserve the id in the edited reminder
+                      };
+                      // Sort new reminders
+                      const dayObj = gridCalendar[weekIndex][dayIndex];
+                      if (dayObj) {
+                        dayObj.reminders = sortReminders(remindersList);
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          } else {
+            // Save new reminder
+
+            const id = uuidV4(); // Assign new id with uuidV4 library
+            const date = reminder.date.getDate();
+
+            // Goes through every week of the month
             for (
               let weekIndex = 0;
               weekIndex < gridCalendar.length;
               weekIndex++
             ) {
+              // goes through every day of the week
               for (let dayIndex = 0; dayIndex < 7; dayIndex++) {
                 const day = gridCalendar[weekIndex][dayIndex];
-
+                // Validate day existency and the dates match
                 if (day && day.dayNum === date) {
-                  day.reminders.push({ id, ...reminder });
+                  day.reminders.push({ id, ...reminder }); // Push the new reminder
+                  //Sort reminders saved
+                  const dayObj = gridCalendar[weekIndex][dayIndex];
+                  if (dayObj) {
+                    dayObj.reminders = sortReminders(day.reminders);
+                  }
                 }
               }
             }
-            setGridCalendar(gridCalendar);
           }
+          //Display reminders on the calendar view in the correct time order.
+          setGridCalendar(gridCalendar);
         }
 
         onClose();
@@ -78,6 +130,7 @@ export default function Calendar() {
 
   return (
     <Box p="10px">
+      <HeaderWeek />
       {gridCalendar &&
         gridCalendar.map((week, i) => (
           <Grid templateColumns="repeat(7, 1fr)" key={i}>
@@ -86,29 +139,73 @@ export default function Calendar() {
                 key={j}
                 height="200px"
                 w="100%"
-                p="20px"
+                p="30px 0px 0px 0px"
                 position="relative"
-                border={
-                  '1px solid ' +
-                  (currentDate === day?.dayNum ? 'blue' : 'rgb(226, 232, 240)')
-                }
+                border={'1px solid rgb(226, 232, 240)'}
+                fontSize="14px"
+                fontWeight="600"
+                color="#70757a"
                 overflow="auto"
-                onClick={onOpen}
+                onClick={() => handleDayClick(day?.dayNum)}
               >
-                <Box position="absolute" top="5px" left="5px">
+                <Flex
+                  justify="center"
+                  align="center"
+                  position="absolute"
+                  w="27px"
+                  h="27px"
+                  top="5px"
+                  left="5px"
+                  fontWeight="600"
+                  {...(currentDate === day?.dayNum
+                    ? {
+                        color: '#fff',
+                        borderRadius: '50%',
+                        backgroundColor: '#3182ce',
+                      }
+                    : {
+                        _hover: {
+                          backgroundColor: '#dadce0',
+                          borderRadius: '50%',
+                        },
+                      })}
+                >
                   {day && day.dayNum}
-                </Box>
+                </Flex>
                 {day?.reminders.map((reminder, idx) => (
-                  <Box
+                  <Flex
+                    align="center"
                     key={idx}
-                    m="10px"
+                    m="5px"
                     p="2px 5px"
-                    borderRadius="10px"
-                    border={'1px solid ' + reminder.color}
                     cursor="pointer"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setCurrentReminder(reminder);
+                      onOpen();
+                    }}
+                    _hover={{
+                      backgroundColor: '#dadce0',
+                      borderRadius: '10px',
+                    }}
                   >
-                    {reminder.title}
-                  </Box>
+                    <Box
+                      w="10px"
+                      h="10px"
+                      marginRight="5px"
+                      borderRadius="50%"
+                      backgroundColor={reminder.color}
+                      flexShrink={0}
+                    />
+                    <Box
+                      fontWeight="500"
+                      whiteSpace="nowrap"
+                      overflow="hidden"
+                      textOverflow="ellipsis"
+                    >
+                      {reminder.title}
+                    </Box>
+                  </Flex>
                 ))}
               </Box>
             ))}
@@ -122,7 +219,16 @@ export default function Calendar() {
           Next
         </Button>
       </Flex>
-      <ReminderModal isOpen={isOpen} onClose={onClose} onSubmit={onSubmit} />
+      <ReminderModal
+        isOpen={isOpen}
+        onClose={() => {
+          onClose();
+          setCurrentReminder(undefined);
+        }}
+        onSubmit={onSubmit}
+        currentReminder={currentReminder}
+        currentDayNum={currentDayNum}
+      />
     </Box>
   );
 }
@@ -133,13 +239,16 @@ function generateCalendar(startWeekDay: number, numDays: number) {
 
   // Starting month with null
   for (colIndex = 0; colIndex < startWeekDay; colIndex++) {
-    calendar[0].push(null); // [[0,0,...]], and colIndex incremented
+    calendar[0].push(null); // [[null,null,...]], and colIndex incremented
   }
 
   // Fill the calendar with the day numbers and their respective remainders
   let week = 0; // [0,1,2,3,4...]
   for (let dayNum = 1; dayNum <= numDays; dayNum++) {
-    const dayObj = { dayNum, reminders: [] }; // Object with dayNum and list of reminders for each day
+    const dayObj = {
+      dayNum,
+      reminders: [],
+    }; // Object with dayNum and list of reminders for each day
     calendar[week][colIndex] = dayObj; // Assign dayObject to each column
 
     // Condition for changing week
@@ -159,3 +268,9 @@ function generateCalendar(startWeekDay: number, numDays: number) {
 
   return calendar;
 }
+const sortReminders = (reminderList: Reminder[]) => {
+  return reminderList.sort(
+    (reminderA: Reminder, reminderB: Reminder) =>
+      reminderA.date.getTime() - reminderB.date.getTime()
+  );
+};
