@@ -17,14 +17,19 @@ import {
   ModalBody,
   ModalCloseButton,
   Box,
+  FormLabel,
+  Flex,
 } from '@chakra-ui/react';
+
+import LocationInput, { LocationInputValue } from './LocationInput';
 
 export type Reminder = {
   id?: string;
   title: string;
   color: string;
   date: Date;
-  city: string;
+  location: LocationInputValue;
+  temperature: string;
 };
 
 export default function ReminderModal({
@@ -48,11 +53,6 @@ export default function ReminderModal({
     formState,
     reset,
   } = useForm();
-
-  // const api = {
-  //   key: '6f2938e6fae5cd744b897d9098df7e78',
-  //   base: 'http://api.openweathermap.org/data/2.5',
-  // };
 
   useEffect(() => {
     if (currentDayNum) {
@@ -78,11 +78,10 @@ export default function ReminderModal({
       return 'Max 30 chars please';
     } else return true;
   }
+
   function validateCity(value: any) {
     if (!value) {
       return 'Please write a city';
-    } else if (value.length > 30) {
-      return 'Max 30 chars please';
     } else return true;
   }
 
@@ -107,15 +106,19 @@ export default function ReminderModal({
                 </FormErrorMessage>
               </FormControl>
 
-              <FormControl paddingTop="10px" isInvalid={errors.city}>
-                <Input
-                  name="city"
-                  placeholder="Add a city"
-                  ref={register({ validate: validateCity })}
-                />
-                <FormErrorMessage>
-                  {errors.city && errors.city.message}
-                </FormErrorMessage>
+              <FormControl paddingTop="10px">
+                <Flex>
+                  <Controller
+                    name="location"
+                    control={control}
+                    render={({ onChange, value }) => (
+                      <LocationInput
+                        onLocationChange={onChange}
+                        location={value}
+                      />
+                    )}
+                  />
+                </Flex>
               </FormControl>
 
               <FormControl paddingTop="10px">

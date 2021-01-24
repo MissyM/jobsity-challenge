@@ -1,3 +1,8 @@
 * {
   box-sizing: border-box;
 }
+
+/* puts the google places autocomplete dropdown results above the bootstrap modal 1050 zindex. */
+.pac-container {
+  z-index: 1401 !important;
+}
