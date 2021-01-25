@@ -3,6 +3,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { v4 as uuidV4 } from 'uuid';
 
 import { Box, Button, Flex, Grid, useDisclosure } from '@chakra-ui/react';
+import { IoTrashOutline } from 'react-icons/io5';
 
 import ReminderModal, { Reminder } from './ReminderModal';
 import HeaderWeek from './HeaderWeek';
@@ -152,10 +153,10 @@ export default function CalendarRendering() {
                   justify="center"
                   align="center"
                   position="absolute"
-                  w="27px"
-                  h="27px"
                   top="5px"
                   left="5px"
+                  w="27px"
+                  h="27px"
                   fontWeight="600"
                   {...(currentDate === day?.dayNum
                     ? {
@@ -163,15 +164,31 @@ export default function CalendarRendering() {
                         borderRadius: '50%',
                         backgroundColor: '#3182ce',
                       }
-                    : {
-                        _hover: {
-                          backgroundColor: '#dadce0',
-                          borderRadius: '50%',
-                        },
-                      })}
+                    : {})}
                 >
                   {day && day.dayNum}
                 </Flex>
+                {day?.reminders.length !== 0 && day !== null && (
+                  <Box
+                    position="absolute"
+                    top="12px"
+                    right="5px"
+                    cursor="pointer"
+                    padding="3px"
+                    _hover={{
+                      backgroundColor: '#dadce0',
+                      borderRadius: '50%',
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      day.reminders = [];
+                      setGridCalendar([...gridCalendar]);
+                    }}
+                  >
+                    <IoTrashOutline />
+                  </Box>
+                )}
+
                 {day?.reminders.map((reminder, idx) => (
                   <Flex
                     align="center"
@@ -204,6 +221,24 @@ export default function CalendarRendering() {
                       textOverflow="ellipsis"
                     >
                       {reminder.title}
+                    </Box>
+                    <Box
+                      cursor="pointer"
+                      padding="3px"
+                      marginLeft="auto"
+                      _hover={{
+                        backgroundColor: '#dadce0',
+                        borderRadius: '50%',
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        day.reminders = day.reminders.filter(
+                          (r) => r.id !== reminder.id
+                        );
+                        setGridCalendar([...gridCalendar]);
+                      }}
+                    >
+                      <IoTrashOutline />
                     </Box>
                   </Flex>
                 ))}

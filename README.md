@@ -13,4 +13,4 @@ This repository contains a calendar with reminders. Requeriments: [PDF](/Require
 - [ ] Unit test the functionality: Ability to add a new "reminder" (max 30 chars) for a user-entered day and time. Also, include a city.
 - [ ] Expand the calendar to support more than the current month.
 - [x] Properly handle overflow when multiple reminders appear on the same date.
-- [ ] Functionality to delete one or ALL the reminders for a specific day
+- [x] Functionality to delete one or ALL the reminders for a specific day
