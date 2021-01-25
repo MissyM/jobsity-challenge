@@ -110,7 +110,19 @@ export default function ReminderModal({
                         location={value}
                       />
                     )}
+                    rules={{ required: true }}
                   />
+                  {errors.location?.type === 'required' && (
+                    <p
+                      style={{
+                        color: '#ea4646',
+                        paddingLeft: '10px',
+                        paddingTop: '5px',
+                      }}
+                    >
+                      Location is required
+                    </p>
+                  )}
                 </Flex>
               </FormControl>
 

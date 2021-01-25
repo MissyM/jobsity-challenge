@@ -12,3 +12,6 @@ This repository contains a calendar with reminders. Requeriments: [PDF](/Require
 - [x] Add a weather service call from a free API such as Open Weather Map and get the weather forecast (ex. Rain) for the date of the calendar reminder based on the city.
 - [x] Properly handle overflow when multiple reminders appear on the same date.
 - [x] Functionality to delete one or ALL the reminders for a specific day
+- [x] Add validation to location field
+
+The address of this project is: https://jobsity-challenge.vercel.app/

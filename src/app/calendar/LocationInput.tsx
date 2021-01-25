@@ -73,22 +73,24 @@ export default function LocationInput({
         marginRight="5px"
       />
       {location.place !== '' && (
-        <Flex align="center">
-          <Box fontWeight="600" paddingRight="10px">
-            Today:{' '}
-          </Box>{' '}
-          {temperature} °C
-          {icon && (
-            <Image src={`http://openweathermap.org/img/wn/${icon}.png`} />
-          )}
-        </Flex>
+        <>
+          <Flex align="center">
+            <Box fontWeight="600" paddingRight="10px">
+              Today:{' '}
+            </Box>{' '}
+            {temperature} °C
+            {icon && (
+              <Image src={`http://openweathermap.org/img/wn/${icon}.png`} />
+            )}
+          </Flex>
+          <Flex>
+            <Box fontWeight="600" paddingRight="10px">
+              Forecast:{' '}
+            </Box>
+            {forecast && capitalizeFirsLetter(forecast)}
+          </Flex>
+        </>
       )}
-      <Flex>
-        <Box fontWeight="600" paddingRight="10px">
-          Forecast:{' '}
-        </Box>
-        {forecast && capitalizeFirsLetter(forecast)}
-      </Flex>
     </Flex>
   );
 }
