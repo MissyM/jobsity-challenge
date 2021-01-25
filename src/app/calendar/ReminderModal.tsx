@@ -17,7 +17,6 @@ import {
   ModalBody,
   ModalCloseButton,
   Box,
-  FormLabel,
   Flex,
 } from '@chakra-ui/react';
 
@@ -76,12 +75,6 @@ export default function ReminderModal({
       return 'Please write a title';
     } else if (value.length > 30) {
       return 'Max 30 chars please';
-    } else return true;
-  }
-
-  function validateCity(value: any) {
-    if (!value) {
-      return 'Please write a city';
     } else return true;
   }
 
