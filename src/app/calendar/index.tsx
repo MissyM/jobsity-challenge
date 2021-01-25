@@ -19,6 +19,7 @@ export default function CalendarRendering() {
   const [gridCalendar, setGridCalendar] = useState<Calendar | null>();
   const [currentReminder, setCurrentReminder] = useState<Reminder>();
   const [currentDayNum, setCurrentDayNum] = useState<number>();
+
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   useEffect(() => {
@@ -29,6 +30,7 @@ export default function CalendarRendering() {
       now.getMonth(),
       1
     ).getDay();
+
     // Get the number of days
     const numDays = new Date(
       now.getFullYear(),
@@ -246,14 +248,7 @@ export default function CalendarRendering() {
             ))}
           </Grid>
         ))}
-      <Flex w="full" justify="center">
-        <Button variant="link" p="10px 25px">
-          Previous
-        </Button>
-        <Button variant="link" p="10px 25px">
-          Next
-        </Button>
-      </Flex>
+
       <ReminderModal
         isOpen={isOpen}
         onClose={() => {
