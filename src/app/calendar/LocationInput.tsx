@@ -1,17 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Box, Input, BoxProps, Flex, Image } from '@chakra-ui/react';
+import { Location } from './api';
 
 const apiKey = '6f2938e6fae5cd744b897d9098df7e78';
 
 export interface LocationInputProps extends BoxProps {
-  location?: LocationInputValue;
-  onLocationChange: (location: LocationInputValue) => void;
-}
-
-export interface LocationInputValue {
-  place: string;
-  lat: number;
-  lng: number;
+  location?: Location;
+  onLocationChange: (location: Location) => void;
 }
 
 export default function LocationInput({

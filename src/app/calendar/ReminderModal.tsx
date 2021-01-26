@@ -20,16 +20,8 @@ import {
   Flex,
 } from '@chakra-ui/react';
 
-import LocationInput, { LocationInputValue } from './LocationInput';
-
-export type Reminder = {
-  id?: string;
-  title: string;
-  color: string;
-  date: Date;
-  location: LocationInputValue;
-  temperature: string;
-};
+import LocationInput from './LocationInput';
+import { Reminder } from './api';
 
 export default function ReminderModal({
   isOpen,

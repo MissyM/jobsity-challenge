@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
-import { v4 as uuidV4 } from 'uuid';
-
-import { Box, Button, Flex, Grid, useDisclosure } from '@chakra-ui/react';
+import { Box, Flex, Grid, useDisclosure } from '@chakra-ui/react';
 import { IoTrashOutline } from 'react-icons/io5';
 
-import ReminderModal, { Reminder } from './ReminderModal';
+import { Reminder, reminderAPI } from './api';
+import ReminderModal from './ReminderModal';
 import HeaderWeek from './HeaderWeek';
 
 type Day = null | { dayNum: number; reminders: Reminder[] };
@@ -15,6 +14,14 @@ const currentDate = new Date().getDate();
 const currentMonth = new Date().getMonth();
 const currentYear = new Date().getFullYear();
 
+const now = new Date();
+
+// Get initial day of month
+const startWeekDay = new Date(now.getFullYear(), now.getMonth(), 1).getDay();
+
+// Get the number of days
+const numDays = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+
 export default function CalendarRendering() {
   const [gridCalendar, setGridCalendar] = useState<Calendar | null>();
   const [currentReminder, setCurrentReminder] = useState<Reminder>();
@@ -22,24 +29,19 @@ export default function CalendarRendering() {
 
   const { isOpen, onOpen, onClose } = useDisclosure();
 
+  const refreshCalendar = () => {
+    reminderAPI.list().then((reminders) => {
+      const generatedCalendar = generateCalendar(
+        startWeekDay,
+        numDays,
+        reminders
+      ); // Get generated calendar
+      setGridCalendar(generatedCalendar); // Set calendar on state
+    });
+  };
+
   useEffect(() => {
-    const now = new Date();
-    // Get initial day of month
-    const startWeekDay = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      1
-    ).getDay();
-
-    // Get the number of days
-    const numDays = new Date(
-      now.getFullYear(),
-      now.getMonth() + 1,
-      0
-    ).getDate();
-
-    const generatedCalendar = generateCalendar(startWeekDay, numDays); // Get generated calendar
-    setGridCalendar(generatedCalendar); // Set calendar on state
+    refreshCalendar();
   }, []);
 
   const handleDayClick = (dayNum?: number) => {
@@ -48,87 +50,28 @@ export default function CalendarRendering() {
   };
 
   const onSubmit = (reminder: Reminder) => {
-    return new Promise<void>((resolve, reject) => {
-      setTimeout(() => {
-        if (
-          reminder.date.getFullYear() !== currentYear ||
-          reminder.date.getMonth() !== currentMonth
-        ) {
-          alert('This calendar is for the current month only');
-          onClose();
-          reject();
-        }
+    if (
+      reminder.date.getFullYear() !== currentYear ||
+      reminder.date.getMonth() !== currentMonth
+    ) {
+      alert('This calendar is for the current month only');
+      onClose();
+    }
 
-        if (gridCalendar) {
-          if (currentReminder) {
-            for (
-              let weekIndex = 0;
-              weekIndex < gridCalendar?.length;
-              weekIndex++
-            ) {
-              for (let dayIndex = 0; dayIndex < 7; dayIndex++) {
-                const remindersList =
-                  gridCalendar[weekIndex][dayIndex]?.reminders;
-                if (remindersList) {
-                  for (
-                    let reminderIndex = 0;
-                    reminderIndex < remindersList.length;
-                    reminderIndex++
-                  ) {
-                    // Allow edit and save reminder object
+    if (gridCalendar) {
+      const promise = currentReminder
+        ? reminderAPI.edit({
+            id: currentReminder.id,
+            ...reminder,
+          })
+        : reminderAPI.create(reminder);
 
-                    if (
-                      remindersList[reminderIndex].id === currentReminder.id
-                    ) {
-                      remindersList[reminderIndex] = {
-                        ...reminder,
-                        id: currentReminder.id, //Conserve the id in the edited reminder
-                      };
-                      // Sort new reminders
-                      const dayObj = gridCalendar[weekIndex][dayIndex];
-                      if (dayObj) {
-                        dayObj.reminders = sortReminders(remindersList);
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          } else {
-            // Save new reminder
-
-            const id = uuidV4(); // Assign new id with uuidV4 library
-            const date = reminder.date.getDate();
-
-            // Goes through every week of the month
-            for (
-              let weekIndex = 0;
-              weekIndex < gridCalendar.length;
-              weekIndex++
-            ) {
-              // goes through every day of the week
-              for (let dayIndex = 0; dayIndex < 7; dayIndex++) {
-                const day = gridCalendar[weekIndex][dayIndex];
-                // Validate day existency and the dates match
-                if (day && day.dayNum === date) {
-                  day.reminders.push({ id, ...reminder }); // Push the new reminder
-                  //Sort reminders saved
-                  const dayObj = gridCalendar[weekIndex][dayIndex];
-                  if (dayObj) {
-                    dayObj.reminders = sortReminders(day.reminders);
-                  }
-                }
-              }
-            }
-          }
-          //Display reminders on the calendar view in the correct time order.
-          setGridCalendar(gridCalendar);
-        }
-
+      promise?.then(() => {
+        setCurrentReminder(undefined);
+        refreshCalendar();
         onClose();
-        resolve();
-      }, 600); // This simulates a server request
-    });
+      });
+    }
   };
 
   return (
@@ -183,8 +126,9 @@ export default function CalendarRendering() {
                     }}
                     onClick={(e) => {
                       e.stopPropagation();
-                      day.reminders = [];
-                      setGridCalendar([...gridCalendar]);
+                      reminderAPI.clearDay(day.dayNum).then(() => {
+                        refreshCalendar();
+                      });
                     }}
                   >
                     <IoTrashOutline />
@@ -234,10 +178,12 @@ export default function CalendarRendering() {
                       }}
                       onClick={(e) => {
                         e.stopPropagation();
-                        day.reminders = day.reminders.filter(
-                          (r) => r.id !== reminder.id
-                        );
-                        setGridCalendar([...gridCalendar]);
+                        if (!reminder.id) {
+                          return;
+                        }
+                        reminderAPI.remove(reminder.id).then(() => {
+                          refreshCalendar();
+                        });
                       }}
                     >
                       <IoTrashOutline />
@@ -263,7 +209,11 @@ export default function CalendarRendering() {
   );
 }
 
-function generateCalendar(startWeekDay: number, numDays: number) {
+function generateCalendar(
+  startWeekDay: number,
+  numDays: number,
+  reminders: Reminder[]
+) {
   const calendar: Array<any> = [[]];
   let colIndex = 0;
 
@@ -277,7 +227,9 @@ function generateCalendar(startWeekDay: number, numDays: number) {
   for (let dayNum = 1; dayNum <= numDays; dayNum++) {
     const dayObj = {
       dayNum,
-      reminders: [],
+      reminders: sortReminders(
+        reminders.filter((reminder) => reminder.date.getDate() === dayNum)
+      ),
     }; // Object with dayNum and list of reminders for each day
     calendar[week][colIndex] = dayObj; // Assign dayObject to each column
 

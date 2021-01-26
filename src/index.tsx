@@ -4,7 +4,7 @@ import './index.css';
 import App from './App';
 
 // import `ChakraProvider` component
-import { ChakraProvider } from "@chakra-ui/react"
+import { ChakraProvider } from '@chakra-ui/react';
 
 ReactDOM.render(
   <ChakraProvider>
@@ -14,4 +14,3 @@ ReactDOM.render(
   </ChakraProvider>,
   document.getElementById('root')
 );
-
