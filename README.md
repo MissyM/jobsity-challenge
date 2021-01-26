@@ -15,3 +15,8 @@ This repository contains a calendar with reminders. Requeriments: [PDF](/Require
 - [x] Add validation to location field
 
 The address of this project is: https://jobsity-challenge.vercel.app/
+
+Run this code in dev mode like any React project:
+1 Clone the project
+2 Install `package.json` file dependencies
+3 Write `yarn star` in the console. See the calendar in http://localhost:3000/
